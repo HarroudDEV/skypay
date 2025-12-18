@@ -10,11 +10,11 @@ interface AccountService {
   printStatement(): void;
 }
 
-class Account implements AccountService {
-  private balance: number = 0;
+export default class Account implements AccountService {
+  balance: number = 0;
   private transactions: Array<Transaction> = [];
   constructor() {}
-  public deposit(amount: number) {
+  deposit(amount: number) {
     try {
       if (amount <= 0) throw new Error("Amount must be greater than zero.");
       this.transactions.push({
@@ -24,8 +24,9 @@ class Account implements AccountService {
       });
       // update balance
       this.balance += amount;
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      throw new Error(err);
     }
   }
   public withdraw(amount: number) {
@@ -34,26 +35,27 @@ class Account implements AccountService {
       if (amount > this.balance)
         throw new Error("Insufficient funds for withdrawal.");
       this.transactions.push({
-        amount: amount,
         date: new Date().toLocaleDateString("en-GB"),
+        amount: amount,
         balance: this.balance - amount,
       });
       // update global balance
       this.balance -= amount;
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      throw new Error(err);
     }
   }
   public printStatement() {
     if (this.transactions.length === 0)
       console.log("This account has no transactions yet.");
     console.table(this.transactions);
+    console.log(this.transactions);
+    return this.transactions;
   }
 }
+
 const acc = new Account();
-acc.deposit(50);
-acc.deposit(50);
-acc.withdraw(50);
-acc.deposit(500);
-acc.withdraw(200);
+acc.deposit(1500);
+acc.deposit(800);
+acc.withdraw(700);
 acc.printStatement();
